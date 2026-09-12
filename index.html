@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FundEdu — Abrimos el Sistema de Ola 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#06211F;
+    --ink-2:#0A2E2B;
+    --panel:#0E3A36;
+    --stone:#F4FBF9;
+    --stone-dim:#BFE0DA;
+    --teal:#0396A6;
+    --teal-light:#0AA6A6;
+    --green:#2EA684;
+    --lime:#83D95B;
+    --gold:#F5C56B;
+    --line: rgba(244,251,249,0.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--stone);
+    font-family:'Poppins', sans-serif;
+    font-weight:400;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.mono-label{ font-family:'Montserrat', sans-serif; }
+
+  ::selection{ background:var(--gold); color:var(--ink); }
+
+  /* ---------- Door motif (fixed, scroll-driven) ---------- */
+  #door-stage{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0.5;
+  }
+  #door-glow{
+    width: 40px;
+    height: 46vh;
+    background: radial-gradient(ellipse at center, rgba(245,197,107,0.95) 0%, rgba(245,197,107,0.55) 30%, rgba(245,197,107,0) 72%);
+    border-radius: 50% / 20%;
+    filter: blur(2px);
+    transition: width 0.05s linear, height 0.05s linear;
+  }
+  #stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap{ position:relative; z-index:1; }
+  section{
+    min-height:100vh;
+    padding: 8vh 8vw;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    max-width: 1180px;
+    margin: 0 auto;
+    position:relative;
+    border-bottom: 1px solid transparent;
+  }
+
+  .eyebrow{
+    font-family:'Montserrat', sans-serif;
+    font-weight:700;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--lime);
+    margin-bottom: 1.1rem;
+  }
+
+  h1{
+    font-size: clamp(2.4rem, 5.4vw, 4.6rem);
+    line-height:1.05;
+    font-weight:800;
+    max-width: 16ch;
+    color:var(--stone);
+  }
+  h1 em{
+    font-style: normal;
+    background: linear-gradient(90deg, var(--lime), var(--teal-light));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  h2{
+    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+    font-weight:700;
+    line-height:1.15;
+    max-width: 22ch;
+    margin-bottom: 1.6rem;
+  }
+
+  p.lead{
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    color: var(--stone-dim);
+    max-width: 58ch;
+    line-height:1.6;
+    font-weight:300;
+  }
+
+  .tag{
+    display:inline-block;
+    font-family:'Montserrat',sans-serif;
+    font-weight:600;
+    font-size:0.72rem;
+    padding: 0.3em 0.85em;
+    border-radius: 999px;
+    border:1px solid var(--line);
+    color: var(--stone-dim);
+    margin: 0 0.4em 0.5em 0;
+  }
+
+  /* ---------- Hero ---------- */
+  #hero{
+    align-items:flex-start;
+  }
+  .hero-quote{
+    margin-top:3rem;
+    padding-left:1.2rem;
+    border-left: 2px solid var(--gold);
+    color: var(--stone-dim);
+    font-style:normal;
+    font-size:1.05rem;
+    max-width: 46ch;
+  }
+  .scroll-cue{
+    position:absolute;
+    bottom: 6vh;
+    left: 8vw;
+    font-family:'Montserrat', sans-serif;
+    font-size:0.72rem;
+    font-weight:600;
+    letter-spacing:0.04em;
+    color: var(--stone-dim);
+    display:flex;
+    align-items:center;
+    gap:0.6em;
+  }
+  .scroll-cue .line{
+    width:36px; height:1px; background:var(--stone-dim);
+    animation: pulseline 1.8s ease-in-out infinite;
+  }
+  @keyframes pulseline{ 0%,100%{opacity:0.3;} 50%{opacity:1;} }
+
+  /* ---------- Objectives ---------- */
+  .obj-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem;
+    margin-top: 2.2rem;
+  }
+  .obj-card{
+    border:1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.8rem 1.6rem;
+    background: linear-gradient(180deg, rgba(244,251,249,0.03), rgba(244,251,249,0));
+  }
+  .obj-num{
+    font-family:'Montserrat',sans-serif;
+    font-weight:800;
+    font-size:0.85rem;
+    color:var(--lime);
+    margin-bottom:0.9rem;
+  }
+  .obj-card p{ color:var(--stone-dim); font-size:0.98rem; line-height:1.55; }
+  .obj-card h3{ font-size:1.15rem; margin-bottom:0.6rem; color:var(--stone); font-weight:700;}
+
+  /* ---------- Question section ---------- */
+  #question{
+    align-items:center;
+    text-align:center;
+  }
+  .big-question{
+    font-family:'Montserrat', sans-serif;
+    font-weight:700;
+    font-size: clamp(1.5rem, 3.6vw, 2.5rem);
+    max-width: 20ch;
+    margin: 0 auto 2.6rem;
+    line-height:1.25;
+  }
+  .chip-field{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:0.55rem; max-width:760px; margin:0 auto;
+  }
+  .chip{
+    font-size:0.85rem;
+    padding:0.5em 1.1em;
+    border-radius: 999px;
+    border:1px solid var(--teal-light);
+    color: var(--stone);
+    background: rgba(3,150,166,0.08);
+    opacity:0;
+    transform: translateY(6px);
+    transition: opacity 0.45s ease, transform 0.45s ease, background 0.25s ease, border-color 0.25s ease;
+  }
+  .chip.show{ opacity:1; transform:translateY(0); }
+  .chip:hover{ background: var(--teal); border-color:var(--teal); }
+
+  /* ---------- Package section ---------- */
+  .pkg-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:1rem;
+    margin-top:2.2rem;
+  }
+  .pkg-item{
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:1.3rem 1.4rem;
+    display:flex;
+    gap:1rem;
+    align-items:flex-start;
+  }
+  .pkg-mark{
+    font-family:'Montserrat',sans-serif;
+    font-weight:800;
+    font-size:0.72rem;
+    padding:0.25em 0.55em;
+    border-radius:3px;
+    white-space:nowrap;
+    margin-top:0.2rem;
+  }
+  .mark-new{ background: rgba(131,217,91,0.16); color:var(--lime); border:1px solid rgba(131,217,91,0.4);}
+  .mark-reuse{ background: rgba(3,150,166,0.16); color:var(--teal-light); border:1px solid rgba(3,150,166,0.4);}
+  .pkg-item h4{ font-size:1rem; font-weight:600; color:var(--stone); margin-bottom:0.3rem; font-family:'Montserrat',sans-serif;}
+  .pkg-item p{ font-size:0.88rem; color:var(--stone-dim); line-height:1.5; }
+
+  /* ---------- Fixed vs variable ---------- */
+  .fv-table{
+    margin-top:2rem;
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .fv-row{
+    display:grid;
+    grid-template-columns: 1.3fr 0.9fr;
+    border-top:1px solid var(--line);
+  }
+  .fv-row:first-child{ border-top:none; }
+  .fv-row.head{
+    background: rgba(244,251,249,0.04);
+    font-family:'Montserrat',sans-serif;
+    font-weight:700;
+    font-size:0.75rem;
+    letter-spacing:0.02em;
+    color: var(--stone-dim);
+  }
+  .fv-cell{ padding:0.95rem 1.3rem; font-size:0.93rem; }
+  .fv-row.head .fv-cell{ padding:0.7rem 1.3rem; }
+  .fv-status{
+    display:inline-flex; align-items:center; gap:0.5em;
+    font-family:'Montserrat',sans-serif; font-weight:600; font-size:0.85rem;
+  }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .dot.fixed{ background:var(--lime); }
+  .dot.variable{ background:var(--gold); }
+
+  /* ---------- Areas ---------- */
+  .area-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:1.1rem;
+    margin-top:2.2rem;
+  }
+  .area-card{
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:1.6rem 1.4rem;
+    min-height: 190px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    background: var(--panel);
+  }
+  .area-letter{
+    font-family:'Montserrat',sans-serif; font-weight:800; font-size:1.3rem;
+    color: var(--lime);
+  }
+  .area-card h4{ font-family:'Montserrat',sans-serif; font-weight:700; font-size:1.05rem; margin:0.5rem 0 0.7rem; }
+  .area-card ul{ list-style:none; font-size:0.85rem; color:var(--stone-dim); line-height:1.7; }
+  .area-card ul li::before{ content:"— "; color:var(--teal-light); }
+
+  /* ---------- Exercise ---------- */
+  .steps{
+    margin-top:2.4rem;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .step{
+    display:grid;
+    grid-template-columns: 70px 1fr;
+    padding: 1.5rem 0;
+    border-top:1px solid var(--line);
+  }
+  .step:last-child{ border-bottom:1px solid var(--line); }
+  .step-index{ font-family:'Montserrat',sans-serif; font-weight:800; font-size:1.6rem; color: var(--teal-light); }
+  .step h4{ font-family:'Montserrat',sans-serif; font-weight:700; font-size:1.15rem; margin-bottom:0.5rem; }
+  .step p{ color:var(--stone-dim); font-size:0.95rem; max-width:56ch; line-height:1.6; }
+
+  /* ---------- Levels ---------- */
+  .levels{
+    margin-top:2.6rem;
+    position:relative;
+  }
+  .level-track{
+    position:relative;
+    padding-left: 2.4rem;
+  }
+  .level-track::before{
+    content:"";
+    position:absolute;
+    left: 9px; top:6px; bottom:6px;
+    width:2px;
+    background: linear-gradient(180deg, var(--teal-light), var(--lime));
+    opacity:0.4;
+  }
+  .level{
+    position:relative;
+    padding-bottom:2.2rem;
+  }
+  .level:last-child{ padding-bottom:0; }
+  .level::before{
+    content:"";
+    position:absolute;
+    left: -2.4rem;
+    top:4px;
+    width:16px; height:16px;
+    border-radius:50%;
+    background: var(--ink);
+    border:2px solid var(--lime);
+  }
+  .level h4{ font-family:'Montserrat',sans-serif; font-weight:700; font-size:1.2rem; margin-bottom:0.35rem; }
+  .level .lvl-q{ color:var(--gold); font-size:0.9rem; margin-bottom:0.4rem; font-style:italic; }
+  .level p{ color:var(--stone-dim); font-size:0.95rem; max-width:52ch; }
+
+  /* ---------- Closing ---------- */
+  #closing{
+    text-align:left;
+  }
+  .role-shift{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:1.6rem;
+    margin: 2.2rem 0 3rem;
+  }
+  .role-col{
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:1.6rem;
+  }
+  .role-col.you{ border-color: var(--gold); }
+  .role-col.them{ border-color: var(--teal-light); }
+  .role-col .role-title{ font-family:'Montserrat',sans-serif; font-weight:700; font-size:0.85rem; letter-spacing:0.02em; margin-bottom:0.9rem; }
+  .role-col.you .role-title{ color:var(--gold); }
+  .role-col.them .role-title{ color:var(--teal-light); }
+  .role-col p{ color:var(--stone-dim); font-size:0.98rem; line-height:1.6; }
+
+  .final-quote{
+    font-family:'Montserrat',sans-serif;
+    font-weight:700;
+    font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+    line-height:1.4;
+    max-width: 22ch;
+    color:var(--stone);
+    padding-left:1.2rem;
+    border-left:2px solid var(--gold);
+  }
+  .final-attr{ margin-top:1rem; color:var(--stone-dim); font-size:0.9rem; }
+
+  footer{
+    text-align:center;
+    padding: 4rem 8vw 3rem;
+    color: var(--stone-dim);
+    font-size:0.82rem;
+    position:relative;
+    z-index:1;
+  }
+
+  /* ---------- Nav dots ---------- */
+  #navdots{
+    position:fixed;
+    right: 2.4rem;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:5;
+    display:flex;
+    flex-direction:column;
+    gap:0.9rem;
+  }
+  #navdots button{
+    width:9px; height:9px;
+    border-radius:50%;
+    background: transparent;
+    border:1px solid var(--stone-dim);
+    cursor:pointer;
+    padding:0;
+    transition: all 0.25s ease;
+  }
+  #navdots button.active{
+    background: var(--lime);
+    border-color: var(--lime);
+    transform: scale(1.3);
+  }
+
+  #progress{
+    position:fixed;
+    top:0; left:0;
+    height:2px;
+    background: linear-gradient(90deg, var(--teal), var(--lime));
+    z-index:6;
+    width:0%;
+  }
+
+  @media (max-width: 860px){
+    .obj-grid, .pkg-grid, .area-grid, .role-shift{ grid-template-columns: 1fr; }
+    #navdots{ display:none; }
+    section{ padding: 7vh 6vw; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="door-stage"><div id="door-glow"></div></div>
+<canvas id="stars"></canvas>
+
+<nav id="navdots"></nav>
+
+<div class="wrap">
+
+  <section id="hero" data-title="Inicio">
+    <div class="eyebrow">FundEdu · Reunión de equipo · Sistema Ola 1</div>
+    <h1>Hoy no repartimos tareas.<br>Abrimos <em>el sistema</em>.</h1>
+    <p class="lead">Ya construiste el paquete completo de una charla FundEdu. Lo que falta es convertirlo en algo que todo el equipo pueda entender, operar y mejorar contigo.</p>
+    <div class="hero-quote">"No quiero voluntarios. Quiero conexiones. Quiero ser el pilar de proyectos a largo plazo." — Irina, FundEdu</div>
+    <div class="scroll-cue"><span class="line"></span> desliza para ver la ruta de la reunión</div>
+  </section>
+
+  <section id="objetivos" data-title="Objetivos">
+    <div class="eyebrow">Antes de empezar</div>
+    <h2>De esta reunión salimos con tres cosas</h2>
+    <p class="lead">No es una capacitación de documentos. Es el primer paso para que Ola 1 deje de vivir solo en la cabeza de Irina.</p>
+    <div class="obj-grid">
+      <div class="obj-card">
+        <div class="obj-num">01</div>
+        <h3>Entender el mapa</h3>
+        <p>Todo el equipo entiende qué es una experiencia de Ola 1 y cómo se arma de principio a fin.</p>
+      </div>
+      <div class="obj-card">
+        <div class="obj-num">02</div>
+        <h3>Ver qué es fijo y qué cambia</h3>
+        <p>Distinguir qué se reutiliza tal cual en cada charla y qué se diseña de nuevo cada vez.</p>
+      </div>
+      <div class="obj-card">
+        <div class="obj-num">03</div>
+        <h3>Encontrar una función</h3>
+        <p>Cada integrante empieza a ubicarse dentro del sistema, no solo a recibir tareas sueltas.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pregunta" data-title="La pregunta">
+    <div class="eyebrow">Dinámica de apertura</div>
+    <div class="big-question">"Si mañana tuviéramos que ejecutar esta charla sin que Irina estuviera presente, ¿qué necesitaríamos?"</div>
+    <div class="chip-field" id="chipfield">
+      <span class="chip">contenido</span>
+      <span class="chip">PPT</span>
+      <span class="chip">facilitador</span>
+      <span class="chip">guion</span>
+      <span class="chip">dinámicas</span>
+      <span class="chip">materiales</span>
+      <span class="chip">inscripción</span>
+      <span class="chip">mensajes</span>
+      <span class="chip">encuesta</span>
+      <span class="chip">certificado</span>
+      <span class="chip">tecnología</span>
+      <span class="chip">asistencia</span>
+      <span class="chip">cronograma</span>
+    </div>
+  </section>
+
+  <section id="paquete" data-title="El paquete">
+    <div class="eyebrow">La revelación</div>
+    <h2>Todo eso que dijeron ya tiene nombre: el paquete de experiencia</h2>
+    <p class="lead">No son documentos sueltos. Son piezas de una misma charla — algunas se crean de nuevo cada vez, otras ya están resueltas para siempre.</p>
+    <div class="pkg-grid">
+      <div class="pkg-item"><span class="pkg-mark mark-new">nuevo</span><div><h4>Sistema de Experiencia</h4><p>Identidad, 3 ideas y los 6 Momentos de esta charla en particular.</p></div></div>
+      <div class="pkg-item"><span class="pkg-mark mark-new">nuevo</span><div><h4>Guion del Facilitador</h4><p>Palabra por palabra: las Misiones, tiempos y materiales de cada una.</p></div></div>
+      <div class="pkg-item"><span class="pkg-mark mark-new">nuevo</span><div><h4>Formularios y Mensajes</h4><p>Inscripción, confirmación, encuesta de cierre y texto del certificado.</p></div></div>
+      <div class="pkg-item"><span class="pkg-mark mark-new">nuevo</span><div><h4>Dinámica Web propia</h4><p>El artefacto tecnológico interactivo de esta charla — ya no se pregunta si va, siempre va.</p></div></div>
+      <div class="pkg-item"><span class="pkg-mark mark-reuse">reutiliza</span><div><h4>Agenda y Cronograma</h4><p>Mismo archivo siempre — solo se llena la sección nueva.</p></div></div>
+      <div class="pkg-item"><span class="pkg-mark mark-reuse">reutiliza</span><div><h4>Excel de Seguimiento</h4><p>Ya sirve para las 5 charlas de Ola 1. Solo se elige el nombre en el desplegable.</p></div></div>
+    </div>
+  </section>
+
+  <section id="fijo-variable" data-title="Fijo vs variable">
+    <div class="eyebrow">El verdadero sistema</div>
+    <h2>Lo que se repite y lo que se diseña</h2>
+    <p class="lead">Esta distinción es la que hace que la Charla 2, la 3, la 4 y la 5 tomen cada vez menos tiempo.</p>
+    <div class="fv-table">
+      <div class="fv-row head">
+        <div class="fv-cell">Elemento</div>
+        <div class="fv-cell">¿Qué hacemos con él?</div>
+      </div>
+      <div class="fv-row"><div class="fv-cell">Los 6 Momentos del guion</div><div class="fv-cell"><span class="fv-status"><span class="dot fixed"></span>Se mantiene</span></div></div>
+      <div class="fv-row"><div class="fv-cell">Concepto central y 3 ideas</div><div class="fv-cell"><span class="fv-status"><span class="dot variable"></span>Cambia</span></div></div>
+      <div class="fv-row"><div class="fv-cell">Emoción principal</div><div class="fv-cell"><span class="fv-status"><span class="dot variable"></span>Cambia</span></div></div>
+      <div class="fv-row"><div class="fv-cell">Misiones</div><div class="fv-cell"><span class="fv-status"><span class="dot variable"></span>Cambian</span></div></div>
+      <div class="fv-row"><div class="fv-cell">Plantilla de Agenda</div><div class="fv-cell"><span class="fv-status"><span class="dot fixed"></span>Se reutiliza</span></div></div>
+      <div class="fv-row"><div class="fv-cell">Excel de Seguimiento</div><div class="fv-cell"><span class="fv-status"><span class="dot fixed"></span>Se reutiliza</span></div></div>
+      <div class="fv-row"><div class="fv-cell">Que exista una Dinámica Web</div><div class="fv-cell"><span class="fv-status"><span class="dot fixed"></span>Siempre existe</span></div></div>
+      <div class="fv-row"><div class="fv-cell">La forma de esa Dinámica Web</div><div class="fv-cell"><span class="fv-status"><span class="dot variable"></span>Cambia</span></div></div>
+      <div class="fv-row"><div class="fv-cell">Casos peruanos de ejemplo</div><div class="fv-cell"><span class="fv-status"><span class="dot variable"></span>Cambian</span></div></div>
+    </div>
+  </section>
+
+  <section id="areas" data-title="Áreas">
+    <div class="eyebrow">¿En qué ayuda cada quien?</div>
+    <h2>No asignamos documentos. Ubicamos áreas.</h2>
+    <p class="lead">Una persona puede liderar un área y colaborar en otra. No hacen falta quince cargos distintos.</p>
+    <div class="area-grid">
+      <div class="area-card">
+        <div><span class="area-letter">A</span><h4>Diseño de experiencia</h4><ul><li>Concepto e ideas</li><li>Emoción y estructura</li><li>Experiencia del participante</li></ul></div>
+      </div>
+      <div class="area-card">
+        <div><span class="area-letter">B</span><h4>Contenido y comunicación visual</h4><ul><li>PPT y narrativa</li><li>Claridad del mensaje</li><li>Recursos visuales</li></ul></div>
+      </div>
+      <div class="area-card">
+        <div><span class="area-letter">C</span><h4>Experiencia tecnológica</h4><ul><li>Dinámica web</li><li>Herramientas digitales</li><li>Enlaces y funcionamiento</li></ul></div>
+      </div>
+      <div class="area-card">
+        <div><span class="area-letter">D</span><h4>Operación</h4><ul><li>Inscripción y mensajes</li><li>Materiales y agenda</li><li>Certificados y asistencia</li></ul></div>
+      </div>
+      <div class="area-card">
+        <div><span class="area-letter">E</span><h4>Evaluación</h4><ul><li>Encuestas de inicio y cierre</li><li>NPS y señales de interés</li><li>Resultados y aprendizajes</li></ul></div>
+      </div>
+      <div class="area-card" style="justify-content:center;">
+        <p style="color:var(--stone-dim); font-size:0.92rem; line-height:1.6;">Después de la reunión — no antes — vemos quién piensa naturalmente en cada área.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="ejercicio" data-title="El ejercicio">
+    <div class="eyebrow">Aprender haciendo</div>
+    <h2>Construyamos juntos el mapa de la Charla 2</h2>
+    <p class="lead">No la vamos a construir completa. Solo el mapa de producción — con el contenido de Emprendimiento ya sobre la mesa.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-index">1</div>
+        <div><h4>¿Qué necesitamos decidir?</h4><p>Nombre, concepto central, las 3 ideas, la emoción principal — lo que nunca se copia de la Charla 1.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-index">2</div>
+        <div><h4>¿Qué tenemos que producir?</h4><p>PPT, guion, Misiones, materiales, dinámica web — el paquete completo aplicado a este Mundo.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-index">3</div>
+        <div><h4>¿Qué podemos reutilizar de la Charla 1?</h4><p>Que el equipo lo descubra solo: los 6 Momentos, la plantilla de agenda, el Excel, la lógica del paquete.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="niveles" data-title="Niveles">
+    <div class="eyebrow">Hacia dónde vamos</div>
+    <h2>La evolución del equipo en cuatro niveles</h2>
+    <div class="levels">
+      <div class="level-track">
+        <div class="level">
+          <h4>Nivel 1 — Entender</h4>
+          <div class="lvl-q">¿Qué es una experiencia FundEdu?</div>
+          <p>Todo el equipo conoce el mapa completo. Es lo que trabajamos hoy.</p>
+        </div>
+        <div class="level">
+          <h4>Nivel 2 — Operar</h4>
+          <div class="lvl-q">¿Puedo ejecutar una charla usando el sistema?</div>
+          <p>Ya no dependen de que Irina explique cada paso desde cero.</p>
+        </div>
+        <div class="level">
+          <h4>Nivel 3 — Diseñar</h4>
+          <div class="lvl-q">¿Puedo ayudar a construir una charla nueva?</div>
+          <p>Participan en concepto, Misiones, tecnología y materiales.</p>
+        </div>
+        <div class="level">
+          <h4>Nivel 4 — Mejorar</h4>
+          <div class="lvl-q">¿Puedo detectar un problema y mejorar el sistema?</div>
+          <p>Aquí nace la autonomía real del equipo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="closing" data-title="Cierre">
+    <div class="eyebrow">Lo que cambia después de hoy</div>
+    <h2>Tu función también evoluciona</h2>
+    <div class="role-shift">
+      <div class="role-col you">
+        <div class="role-title">IRINA</div>
+        <p>Diseña el sistema. Explica el criterio. Hace preguntas. Valida y corrige.</p>
+      </div>
+      <div class="role-col them">
+        <div class="role-title">EL EQUIPO</div>
+        <p>Comprende. Ejecuta. Propone. Documenta. Mejora.</p>
+      </div>
+    </div>
+    <div class="final-quote">No necesitamos inventar otro sistema. Necesitamos que el equipo pueda operar el que ya construimos.</div>
+    <div class="final-attr">Próximo paso: agendar el Laboratorio FundEdu #01 — Construcción del sistema Ola 1.</div>
+  </section>
+
+  <footer>FundEdu · Forma tu futuro con fuerza financiera · Uso interno</footer>
+
+</div>
+
+<script>
+  // ---- Sectio registry & nav dots ----
+  const sections = Array.from(document.querySelectorAll('section[data-title]'));
+  const navdots = document.getElementById('navdots');
+  sections.forEach((sec, i) => {
+    const btn = document.createElement('button');
+    btn.title = sec.dataset.title;
+    btn.addEventListener('click', () => sec.scrollIntoView({behavior:'smooth'}));
+    navdots.appendChild(btn);
+  });
+  const dotButtons = Array.from(navdots.children);
+
+  function updateActive(){
+    let idx = 0;
+    const mid = window.scrollY + window.innerHeight/2;
+    sections.forEach((sec, i) => {
+      if (sec.offsetTop <= mid) idx = i;
+    });
+    dotButtons.forEach((b,i)=> b.classList.toggle('active', i===idx));
+  }
+
+  // ---- Progress bar + door glow ----
+  const progressEl = document.getElementById('progress');
+  const doorGlow = document.getElementById('door-glow');
+
+  function onScroll(){
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) : 0;
+    progressEl.style.width = (pct*100) + '%';
+
+    // door widens from a sliver to fully open as the meeting progresses
+    const minW = 30, maxW = 62;
+    const w = minW + (maxW-minW)*Math.min(pct*1.15,1);
+    const minH = 30, maxH = 66;
+    const h = minH + (maxH-minH)*Math.min(pct*1.15,1);
+    doorGlow.style.width = w + 'vw';
+    doorGlow.style.height = h + 'vh';
+
+    updateActive();
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // ---- Chip reveal (question section) ----
+  const chipfield = document.getElementById('chipfield');
+  const chips = Array.from(chipfield.children);
+  let chipsRevealed = false;
+  function revealChips(){
+    if (chipsRevealed) return;
+    const rect = chipfield.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.8){
+      chipsRevealed = true;
+      chips.forEach((c, i) => setTimeout(()=> c.classList.add('show'), i*90));
+    }
+  }
+  window.addEventListener('scroll', revealChips, {passive:true});
+  revealChips();
+
+  // ---- Subtle starfield ----
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    stars = Array.from({length: 90}, () => ({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: Math.random()*1.3 + 0.2,
+      a: Math.random()*0.6 + 0.15,
+      tw: Math.random()*0.02 + 0.005,
+      dir: Math.random() > 0.5 ? 1 : -1
+    }));
+  }
+  function drawStars(){
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.fillStyle = '#F4FBF9';
+    stars.forEach(s => {
+      s.a += s.tw * s.dir;
+      if (s.a > 0.75 || s.a < 0.1) s.dir *= -1;
+      ctx.globalAlpha = s.a;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(drawStars);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  drawStars();
+
+  // reduced motion respect
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    canvas.style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
